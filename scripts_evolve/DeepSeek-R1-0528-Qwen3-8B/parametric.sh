@@ -96,30 +96,21 @@ CKPT_ARGS=(
     #TODO: find a way to get less context output vs whole context output
 ROLLOUT_ARGS=(
   --disable-rollout-global-dataset
-  --data-source-path slime.rollout.data_source.RolloutDataSourceWithBuffer
+  --data-source-path slime_plugins.parametric.truncating_data_source.TruncatingRolloutDataSource
+  --evolving-gym
+  --evolving-gym-initial-program "${INITIAL_PROGRAM}"
+  --evolving-gym-evaluator-file "${EVALUATOR_FILE}"
+  --evolving-gym-config-path "${CONFIG_YAML}"
+  --evolving-gym-lazy-output-penalty-level "${LAZY_OUTPUT_PENALTY}"
+  --evolving-gym-seed ${SEED}
+  --evolving-gym-reward-process-type "${REWARD_PROCESS_TYPE}"
+
   --apply-chat-template
+  --rm-type evolving-gym
 
-  --custom-generate-function-path parametric.parametric_generate #using custom generate function for parametric training
-    #use Sample.teacher_log_prbs and Sample.rollout_log_probs
-
-  --custom-rm-path parametric.parametric_reward #using custom parametric reward calculation
+  --custom-generate-function-path slime_plugins.parametric.generate_rollout.generate
+  --custom-rm-path slime_plugins.parametric.parametric_reward.custom_rm
   --reward-key reward
-
-
-  ##on-policy distillation args (sglang)
-  #--use-opd
-  #--opd-type sglang
-  #--opd-kl-coef 1.0
-  #--custom-rm-path slime.rollout.on_policy_distillation.reward_func
-  #--custom-reward-post-process-path slime.rollout.on_policy_distillation.post_process_rewards
-  #--rm-url http://127.0.0.1:8067/generate
-  ##opd args (megatron)
-  #--use-opd
-  #--opd-type megatron
-  #--opd-kl-coef 1.0
-  #--opd-teacher-load #path to teacher model weights
-
-  #comment out opd args if using parametric reward
 
   --num-rollout 300
   --rollout-batch-size 32
